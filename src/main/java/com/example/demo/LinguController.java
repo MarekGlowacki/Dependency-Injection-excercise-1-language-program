@@ -5,21 +5,24 @@ import org.springframework.stereotype.Controller;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.Set;
+
 @Controller
 class LinguController {
     private static final int TEST_SIZE = 10;
     private final EntryRepository entryRepository;
     private final FileService fileService;
     private final Scanner scanner;
+    private final LinguAppConfig linguAppConfig;
 
-    public LinguController(EntryRepository entryRepository, FileService fileService, Scanner scanner) {
+    public LinguController(EntryRepository entryRepository, FileService fileService, Scanner scanner, LinguAppConfig linguAppConfig) {
         this.entryRepository = entryRepository;
         this.fileService = fileService;
         this.scanner = scanner;
+        this.linguAppConfig = linguAppConfig;
     }
 
     void mainLoop() {
-        System.out.println("Witaj w aplikacji LinguApp");
+        linguAppConfig.print("Witaj w aplikacji LinguApp");
         Option option = null;
         do {
             printMenu();
@@ -27,7 +30,7 @@ class LinguController {
                 option = chooseOption();
                 executeOption(option);
             } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
+                linguAppConfig.print(e.getMessage());
             }
         } while (option != Option.EXIT);
     }
@@ -48,29 +51,29 @@ class LinguController {
 
     private void startTest() {
         if(entryRepository.isEmpty()) {
-            System.out.println("Dodaj przynajmniej jedną frazę do bazy.");
+            linguAppConfig.print("Dodaj przynajmniej jedną frazę do bazy.");
             return;
         }
         final int testSize = Math.min(entryRepository.size(), TEST_SIZE);
         Set<Entry> randomEntries = entryRepository.getRandomEntries(testSize);
         int score = 0;
         for (Entry entry : randomEntries) {
-            System.out.printf("Podaj tłumaczenie dla :\"%s\"\n", entry.getOriginal());
+            linguAppConfig.print(String.format("Podaj tłumaczenie dla :\"%s\"\n", entry.getOriginal()));
             String translation = scanner.nextLine();
             if(entry.getTranslation().equalsIgnoreCase(translation)) {
-                System.out.println("Odpowiedź poprawna");
+                linguAppConfig.print("Odpowiedź poprawna");
                 score++;
             } else {
-                System.out.println("Odpowiedź niepoprawna - " + entry.getTranslation());
+                linguAppConfig.print("Odpowiedź niepoprawna - " + entry.getTranslation());
             }
         }
         System.out.printf("Twój wynik: %d/%d\n", score, testSize);
     }
 
     private void addEntry() {
-        System.out.println("Podaj oryginalną frazę");
+        linguAppConfig.print("Podaj oryginalną frazę");
         String original = scanner.nextLine();
-        System.out.println("Podaj tłumaczenie");
+        linguAppConfig.print("Podaj tłumaczenie");
         String translation = scanner.nextLine();
         Entry entry = new Entry(original, translation);
         entryRepository.add(entry);
@@ -79,20 +82,20 @@ class LinguController {
     private void close() {
         try {
             fileService.saveEntries(entryRepository.getAll());
-            System.out.println("Zapisano stan aplikacji");
+            linguAppConfig.print("Zapisano stan aplikacji");
         } catch (IOException e) {
-            System.out.println("Nie udało się zapisać zmian");
+            linguAppConfig.print("Nie udało się zapisać zmian");
         }
-        System.out.println("Bye Bye!");
+        linguAppConfig.print("Bye Bye!");
     }
 
     private void printMenu() {
-        System.out.println("Wybierz opcję:");
+        linguAppConfig.print("Wybierz opcję:");
         for (Option option : Option.values()) {
-            System.out.println(option);
+            linguAppConfig.print(String.valueOf(option));
         }
     }
-    private static enum Option {
+    private enum Option {
         ADD_ENTRY(1, "Dodaj tekst z tłumaczeniem"),
         START_TEST(2, "Rozpocznij test"),
         EXIT(3, "Koniec programu");
