@@ -8,6 +8,7 @@ import java.util.*;
 @Repository
 class EntryRepository {
     private List<Entry> entries;
+
     @Autowired
     EntryRepository(FileService fileService) {
         try {
