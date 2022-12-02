@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
@@ -11,7 +12,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 @Service
 class FileService {
-    private final String fileName = "data.csv";
+    private final String fileName;
+
+    FileService(@Value("${app.message.filename}") String fileName) {
+        this.fileName = fileName;
+    }
 
     List<Entry> readAllFile() throws IOException {
         return Files.readAllLines(Paths.get(fileName))

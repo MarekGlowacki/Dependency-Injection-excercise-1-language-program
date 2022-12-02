@@ -1,3 +1,4 @@
 app:
   message:
-    decorator: LOWERCASE
+    decorator: UPPERCASE
+    filename: data.csv
