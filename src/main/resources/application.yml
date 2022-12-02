@@ -2,3 +2,6 @@ app:
   message:
     decorator: UPPERCASE
     filename: data.csv
+spring:
+  banner:
+    location: logo-app.txt
